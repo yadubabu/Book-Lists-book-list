@@ -1,20 +1,14 @@
-//CRUD operation using LocalStorage
-
 import React from "react";
-import "./App.css";
 import { useEffect } from "react";
 import { useState } from "react";
 
 const App = () => {
+  const [books, setBooks] = useState([""]);
+  const [message, setMessage] = useState("");
   const [input, setInput] = useState({
     title: "",
     author: "",
     isbn: "",
-  });
-  const [books, setBooks] = useState([""]);
-  const [message, setMessage] = useState({
-    error: false,
-    msg: "",
   });
   const LOCAL_STORAGE_KEY = "books";
 
@@ -24,50 +18,35 @@ const App = () => {
       setBooks(fetchBooks);
     }
   }, []);
-
-  const submitHandler = (e) => {
-    e.preventDefault();
-
-    if (input) {
-      const { title, author, isbn } = input;
-
-      if (title === "" || author === "" || isbn === "") {
-        setMessage({ error: true, msg: "All fields are Mandatory" });
-      }
-      const newBook = [...books, { ...input }];
-      const addedBook = setBooks(newBook);
-      if (addedBook) {
-        localStorage
-          .setItem(LOCAL_STORAGE_KEY, JSON.stringify(books))
-          .catch((err) => setMessage({ error: true, msg: err }));
-        setMessage({ error: false, msg: "New Book added" });
-        setInput("");
-      }
-    } else return;
-  };
   const changeHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
+  const submitHanlder = (e) => {
+    const { title, author, isbn } = input;
+    e.preventDefault();
+    if (title !== "" && author !== "" && isbn !== "") {
+      setBooks([...books, input]);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(books));
+      setMessage("New Book added");
+    } else {
+      setMessage("All feilds are mandatory");
+    }
+  };
   const deleteHandler = (id) => {
-    console.log(id);
-    const deleteBook = books.filter((book) => book.isbn !== id);
+    const newBook = books.filter((book) => book.isbn !== id);
+    setBooks(newBook);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(books));
-
-    setBooks(deleteBook);
+    setMessage("Book deleted");
   };
   return (
-    <div className="ui form" id="App">
+    <div className="ui form">
       <div className="ui container mt-4">
         <h1 className="ui display-4 text-center">
-          <span className="text-primary">My Book</span>List
+          <i className="fas fa-book-open text-primary"></i> My
+          <span className="text-primary">Book</span>List
         </h1>
-        {message.error === true ? (
-          <h1 style={{ color: "red" }}>{message.msg}</h1>
-        ) : (
-          <h1 color="green">{message.msg}</h1>
-        )}
-
-        <form id="book-form" onSubmit={submitHandler}>
+        {message ? <h1 style={{ color: "red" }}>{message}</h1> : ""}
+        <form id="book-form" onSubmit={submitHanlder}>
           <div className="form-group">
             <label htmlFor="title">Title</label>
             <input
@@ -98,12 +77,15 @@ const App = () => {
               onChange={changeHandler}
             />
           </div>
-          <input type="submit" value="Add Book" className="add" id="add" />
+          <input
+            type="submit"
+            value="Add Book"
+            className="btn btn-primary btn-block"
+          />
         </form>
-
-        <table className="ui table-striped mt-5" id="table">
+        <table className="ui table-striped mt-5">
           <thead>
-            <tr className="main-row">
+            <tr>
               <th>Title</th>
               <th>Author</th>
               <th>ISBN#</th>
@@ -111,24 +93,27 @@ const App = () => {
             </tr>
           </thead>
           <tbody id="book-list">
-            {books.map((book) => {
-              return (
-                <tr className="row">
-                  <td>{book.title}</td>
-                  <td>{book.author}</td>
-                  <td>{book.isbn}</td>
-                  <td>
-                    <button
-                      className="close"
-                      id={book.isbn}
-                      onClick={(e) => deleteHandler(e.target.id)}
-                    >
-                      X
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+            {books !== ""
+              ? books.map((book, index) => {
+                  return (
+                    <>
+                      <tr>
+                        <td>{book.title}</td>
+                        <td>{book.author}</td>
+                        <td>{book.isbn}</td>
+                        <td>
+                          <button
+                            id={book.isbn}
+                            onClick={(e) => deleteHandler(e.target.id)}
+                          >
+                            X
+                          </button>
+                        </td>
+                      </tr>
+                    </>
+                  );
+                })
+              : ""}
           </tbody>
         </table>
       </div>
