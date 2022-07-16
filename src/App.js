@@ -35,7 +35,7 @@ const App = () => {
   const deleteHandler = (id) => {
     const newBook = books.filter((book) => book.isbn !== id);
     setBooks(newBook);
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(books));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newBook));
     setMessage("Book deleted");
   };
   return (
