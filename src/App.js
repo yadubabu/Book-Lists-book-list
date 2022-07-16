@@ -26,26 +26,24 @@ const App = () => {
   }, []);
 
   const submitHandler = (e) => {
-    const { title, author, isbn } = input;
-
     e.preventDefault();
 
     if (input) {
+      const { title, author, isbn } = input;
+
       if (title === "" || author === "" || isbn === "") {
         setMessage({ error: true, msg: "All fields are Mandatory" });
-      } else {
-        setMessage({ error: false, msg: "" });
       }
       const newBook = [...books, { ...input }];
       const addedBook = setBooks(newBook);
       if (addedBook) {
+        localStorage
+          .setItem(LOCAL_STORAGE_KEY, JSON.stringify(books))
+          .catch((err) => setMessage({ error: true, msg: err }));
         setMessage({ error: false, msg: "New Book added" });
         setInput("");
       }
-      localStorage
-        .setItem(LOCAL_STORAGE_KEY, JSON.stringify(books))
-        .catch((err) => setMessage({ error: true, msg: err }));
-    } else return books;
+    } else return;
   };
   const changeHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -53,7 +51,7 @@ const App = () => {
   const deleteHandler = (id) => {
     console.log(id);
     const deleteBook = books.filter((book) => book.isbn !== id);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(books));
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(books));
 
     setBooks(deleteBook);
   };
@@ -63,7 +61,7 @@ const App = () => {
         <h1 className="ui display-4 text-center">
           <span className="text-primary">My Book</span>List
         </h1>
-        {message.error ? (
+        {message.error === true ? (
           <h1 style={{ color: "red" }}>{message.msg}</h1>
         ) : (
           <h1 color="green">{message.msg}</h1>
@@ -139,3 +137,4 @@ const App = () => {
 };
 
 export default App;
+
