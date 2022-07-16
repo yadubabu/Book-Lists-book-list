@@ -1,9 +1,9 @@
-//CRUD operation using LocalStorage
+//CRUD Operations using API
 
-import React from "react";
 import "./App.css";
 import { useEffect } from "react";
 import { useState } from "react";
+import api from "./api/books";
 
 const App = () => {
   const [input, setInput] = useState({
@@ -12,45 +12,31 @@ const App = () => {
     isbn: "",
   });
   const [books, setBooks] = useState([""]);
-  const [message, setMessage] = useState({
-    error: false,
-    msg: "",
-  });
-  const LOCAL_STORAGE_KEY = "books";
-
   useEffect(() => {
-    const fetchBooks = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
-    if (fetchBooks) {
-      setBooks(fetchBooks);
-    }
+    const getAllBooks = async () => {
+      const allBooks = await fetchBooks();
+      if (allBooks) {
+        setBooks(allBooks);
+      }
+    };
+    getAllBooks();
   }, []);
 
+  const fetchBooks = async () => {
+    const response = await api.get("/books");
+    return response.data;
+  };
   const submitHandler = (e) => {
     e.preventDefault();
-
-    if (input !== "") {
-      const { title, author, isbn } = input;
-      if (title === "" || author === "" || isbn === "") {
-        setMessage({ error: true, msg: "All fields are Mandatory" });
-      } else {
-        setMessage({ error: false, msg: "" });
-      }
+    if (input) {
       const newBook = [...books, { ...input }];
-      const addedBook = setBooks(newBook);
-      if (addedBook) {
-        setMessage({ error: false, msg: "New Book added" });
-        setInput("");
-      }
-      localStorage
-        .setItem(LOCAL_STORAGE_KEY, JSON.stringify(books))
-        .catch((err) => setMessage({ error: true, msg: err }));
+      setBooks(newBook);
     } else return books;
   };
   const changeHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
   const deleteHandler = (id) => {
-    console.log(id);
     const deleteBook = books.filter((book) => book.isbn !== id);
     setBooks(deleteBook);
   };
@@ -58,14 +44,9 @@ const App = () => {
     <div className="ui form" id="App">
       <div className="ui container mt-4">
         <h1 className="ui display-4 text-center">
-          <span className="text-primary">My Book</span>List
+          <i className="fas fa-book-open text-primary"></i> My
+          <span className="text-primary">Book</span>List
         </h1>
-        {message ? (
-          <h1 style={{ color: "red" }}>{message.msg}</h1>
-        ) : (
-          <h1 color="green">{message.msg}</h1>
-        )}
-
         <form id="book-form" onSubmit={submitHandler}>
           <div className="form-group">
             <label htmlFor="title">Title</label>
