@@ -53,6 +53,8 @@ const App = () => {
   const deleteHandler = (id) => {
     console.log(id);
     const deleteBook = books.filter((book) => book.isbn !== id);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(books));
+
     setBooks(deleteBook);
   };
   return (
