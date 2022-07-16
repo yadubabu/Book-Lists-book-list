@@ -26,10 +26,11 @@ const App = () => {
   }, []);
 
   const submitHandler = (e) => {
+    const { title, author, isbn } = input;
+
     e.preventDefault();
 
-    if (input !== "") {
-      const { title, author, isbn } = input;
+    if (input) {
       if (title === "" || author === "" || isbn === "") {
         setMessage({ error: true, msg: "All fields are Mandatory" });
       } else {
@@ -60,7 +61,7 @@ const App = () => {
         <h1 className="ui display-4 text-center">
           <span className="text-primary">My Book</span>List
         </h1>
-        {message ? (
+        {message.error ? (
           <h1 style={{ color: "red" }}>{message.msg}</h1>
         ) : (
           <h1 color="green">{message.msg}</h1>
